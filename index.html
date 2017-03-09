@@ -1,26 +1,86 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>Socket.IO chat</title>
+    <meta charset="UTF-8"> <!-- specifies the character encoding for the HTML document -->
+    <title>murmur</title>
+    <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
+    <div class="wrapper">
+      <div id="error-container"></div>
+      <button id="username-button" onclick="setUsername()">[random username]</button>
+      <div class="messages-wrap" id="messages-wrap">
+        <ul id="messages"></ul>
+        <form id="msgField" action="">
+          <input id="msgForm" placeholder="type away..." autocomplete="off"/><button>SEND</button>
+        </form>
+      </div>
+      <div class="users-wrap">
+        <ul id="users"></ul>
+      </div>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
-      $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
+      var user;
+      var data;
+
+      var $usernameButton = $("#username-button");
+      var $msgForm = $("#msgForm");
+      var $msgField = $("#msgField");
+
+      function setUsername(){
+        socket.emit('setUsername', data);
+      };
+
+      // Display an alert if the random userid already exists 
+      socket.on('userExists', function(data){
+        alert("The username " + data + " is already taken!\nPlease randomize again.");
+      });
+
+      // 
+      socket.on('newUser', function(data){
+        user = data.username;
+        $usernameButton.hide();
+        $msgForm.focus();
+      });
+   
+      // Print the users to the user area
+      socket.on('getUsers', function(data){
+        var html = '';
+        for( i = 0; i < data.length; i++){
+          html += '<li>' + data[i] + '</li>';
+        }
+        $('#users').html(html);
+      });
+
+      $('#msgField').submit(function(){
+        socket.emit('msg', $('#msgForm').val());
+        $('#msgForm').val(''); // clear message field 
         return false;
       });
-      socket.on('chat message', function(msg){
+
+      socket.on('msg', function(msg){
         $('#messages').append($('<li>').text(msg));
+        $("#messages-wrap").scrollTop(function () { return this.scrollHeight;}); // http://stackoverflow.com/questions/270612/scroll-to-bottom-of-div#comment34402222_2664878
+//        $("#messages-wrap").animate({scrollTop:$("#messages-wrap")[0].scrollHeight}, 1000); // animated: http://stackoverflow.com/a/2664878 
       });
+
+/*
+      var scrolled = false;
+      function updateScroll(){
+          if(!scrolled){
+              var element = document.getElementById("messages");
+              element.scrollTop = element.scrollHeight;
+          }
+      }
+
+      $("#messages").on('scroll', function(){
+          scrolled=true;
+      });
+*/
     </script>
   </body>
 </html>
