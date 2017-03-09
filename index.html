@@ -62,7 +62,7 @@
         return false;
       });
 
-      socket.on('msg', function(msg){
+      socket.on('msg', function(msg, userid){
         $('#messages').append($('<li>').text(msg));
         $("#messages-wrap").scrollTop(function () { return this.scrollHeight;}); // http://stackoverflow.com/questions/270612/scroll-to-bottom-of-div#comment34402222_2664878
 //        $("#messages-wrap").animate({scrollTop:$("#messages-wrap")[0].scrollHeight}, 1000); // animated: http://stackoverflow.com/a/2664878 

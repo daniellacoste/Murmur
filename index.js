@@ -16,12 +16,12 @@ app.use(express.static(__dirname + '/'));
 
 var users = [];
 var connections = [];
+var messageHistory = []; 
 
 io.on('connection', function(socket){
   console.log('A user connected');
   connections.push(socket); // add socket to array of connections
   console.log('Connected: %s sockets connected', connections.length);
-
 
   // Set username
   socket.on('setUsername', function(userid){
@@ -34,6 +34,11 @@ io.on('connection', function(socket){
       users.push(socket.userid);
       updateUsernames();
       socket.emit('newUser', {username: userid});
+      
+      // Print individual messages that exists in the history array
+      for (var i = 0; i < messageHistory.length; i++){
+        socket.emit('msg', messageHistory[i]); 
+      }
       console.log(users);
     }
   });
@@ -59,7 +64,9 @@ io.on('connection', function(socket){
 
   socket.on('msg', function(msg, userid){
     console.log('Message: ' + msg);
-    io.sockets.emit('msg', '[' + getUTC() + ']: ' + msg);
+    var fullMsg = '[' + getUTC() + ']' + ' ' + socket.userid + ': ' + msg;
+    io.sockets.emit('msg', fullMsg);
+    messageHistory.push(fullMsg);
   });
 
   io.of('/').clients(function(error, clients){
