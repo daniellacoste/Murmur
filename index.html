@@ -12,11 +12,11 @@
       <button id="username-button" onclick="setUsername()">[random username]</button>
       <div class="messages-wrap" id="messages-wrap">
         <ul id="messages"></ul>
-        <form id="msgField" action="">
-          <input id="msgForm" placeholder="type away..." autocomplete="off"/><button>SEND</button>
+        <form id="messages-field" action="">
+          <input id="messages-form" placeholder="type away..." autocomplete="off"/><button>SEND</button>
         </form>
       </div>
-      <div class="users-wrap">
+      <div class="users-wrap" style="display: none;">
         <ul id="users"></ul>
       </div>
     </div>
@@ -27,9 +27,14 @@
       var user;
       var data;
 
+      var $users= $("#users");
+      var $usersWrap= $(".users-wrap");
       var $usernameButton = $("#username-button");
-      var $msgForm = $("#msgForm");
-      var $msgField = $("#msgField");
+
+      var $msgList = $("#messages");
+      var $msgWrap= $("#messages-wrap");
+      var $msgField = $("#messages-field");
+      var $msgForm = $("#messages-form");
 
       function setUsername(){
         socket.emit('setUsername', data);
@@ -40,11 +45,12 @@
         alert("The username " + data + " is already taken!\nPlease randomize again.");
       });
 
-      // 
+      // When a new user is successfully generated, show CSS
       socket.on('newUser', function(data){
         user = data.username;
         $usernameButton.hide();
         $msgForm.focus();
+        $usersWrap.show();
       });
    
       // Print the users to the user area
@@ -53,34 +59,24 @@
         for( i = 0; i < data.length; i++){
           html += '<li>' + data[i] + '</li>';
         }
-        $('#users').html(html);
+        $users.html(html);
       });
 
-      $('#msgField').submit(function(){
-        socket.emit('msg', $('#msgForm').val());
-        $('#msgForm').val(''); // clear message field 
+      $msgField.submit(function(){
+        socket.emit('msg', $msgForm.val());
+        $msgForm.val(''); // clear message field 
         return false;
       });
 
-      socket.on('msg', function(msg, userid){
-        $('#messages').append($('<li>').text(msg));
-        $("#messages-wrap").scrollTop(function () { return this.scrollHeight;}); // http://stackoverflow.com/questions/270612/scroll-to-bottom-of-div#comment34402222_2664878
-//        $("#messages-wrap").animate({scrollTop:$("#messages-wrap")[0].scrollHeight}, 1000); // animated: http://stackoverflow.com/a/2664878 
+      socket.on('msg', function(data){
+        $msgList.append($('<li>' + '<span class=timestamp>[' + data.timestamp + '] </span>' +
+        '<span class=userid style="color:' + data.color + '">' + 
+        data.userid + ': </span>' +
+        '<span class=message>' + data.message + '</li>'));
+
+        $msgWrap.scrollTop(function () { return this.scrollHeight;}); // http://stackoverflow.com/questions/270612/scroll-to-bottom-of-div#comment34402222_2664878
       });
 
-/*
-      var scrolled = false;
-      function updateScroll(){
-          if(!scrolled){
-              var element = document.getElementById("messages");
-              element.scrollTop = element.scrollHeight;
-          }
-      }
-
-      $("#messages").on('scroll', function(){
-          scrolled=true;
-      });
-*/
     </script>
   </body>
 </html>

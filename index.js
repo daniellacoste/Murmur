@@ -62,11 +62,12 @@ io.on('connection', function(socket){
     }
   });
 
+  // Sending messages to other clients
   socket.on('msg', function(msg, userid){
     console.log('Message: ' + msg);
-    var fullMsg = '[' + getUTC() + ']' + ' ' + socket.userid + ': ' + msg;
-    io.sockets.emit('msg', fullMsg);
-    messageHistory.push(fullMsg);
+    var payload = {timestamp: getUTC(), userid: socket.userid, color: 'red', message: msg}; // color function
+    io.sockets.emit('msg', payload);
+    messageHistory.push(payload); // log msg into chat history 
   });
 
   io.of('/').clients(function(error, clients){

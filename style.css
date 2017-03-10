@@ -39,16 +39,6 @@ form button {
   border: 0;
 }
 
-.users-wrap{
-  font-size: 25px;
-  color: #fff;
-  position: absolute;
-  right: 0;
-  float: right;
-  background: #2196F3;
-  width: 30%;
-}
-
 #username-button {
   font-size: 25px;
   color: #fff;
@@ -86,7 +76,6 @@ form button {
 }
 
 #messages li {
-  font-weight: 900;
   padding: 5px 5px;
   margin: 5px;
   border-radius: 15px;
@@ -97,12 +86,44 @@ form button {
 /*  background: #E3F2FD;*/
 }
 
+.users-wrap{
+  position: absolute;
+  right: 0;
+  float: right;
+  background: #BBDEFB;
+  width: 30%;
+}
+
 #users {
   font-size: 20px;
   list-style-type: none;
-  margin: 0;
-  padding: 0;
-  word-wrap: break-word;
+  margin: 5px;
   overflow: auto;
+  padding: 5px;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+#users li {
+  color: #fff;
+  padding: 5px 5px;
+  margin: 5px;
+  border-radius: 10px;
+  background: #EF5350;
+}
+
+.timestamp {
+  font-weight: 100;
+  color: #000;
+}
+
+.userid{
+  font-weight: 100;
+  color: #000;
+}
+
+.message {
+  font-weight: 900;
+  font-size: 25px;
 }
 
