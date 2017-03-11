@@ -45,9 +45,14 @@
         alert("The username " + data + " is already taken!\nPlease randomize again.");
       });
 
+      // Display an alert if the nickname already exists 
+      socket.on('nickExists', function(data){
+        alert("The nickname " + data + " is already taken!\nPlease try again.");
+      });
+
       // When a new user is successfully generated, show CSS
       socket.on('newUser', function(data){
-        user = data.username;
+        userid = data.username;
         $usernameButton.hide();
         $msgForm.focus();
         $usersWrap.show();
@@ -69,14 +74,15 @@
       });
 
       socket.on('msg', function(data){
+        // append each message sent to the chat window 
+
         $msgList.append($('<li>' + '<span class=timestamp>[' + data.timestamp + '] </span>' +
-        '<span class=userid style="color:' + data.color + '">' + 
-        data.userid + ': </span>' +
-        '<span class=message>' + data.message + '</li>'));
+          '<span class=userid style="color:' + data.color + '">' + 
+          data.userid + ': </span>' +
+          '<span class=message>' + data.message + '</li>'));
 
         $msgWrap.scrollTop(function () { return this.scrollHeight;}); // http://stackoverflow.com/questions/270612/scroll-to-bottom-of-div#comment34402222_2664878
       });
-
     </script>
   </body>
 </html>
