@@ -1,4 +1,3 @@
-
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -14,16 +13,16 @@ app.get('/', function(req, res){
 
 app.use(express.static(__dirname + '/'));
 
-var users = [];
-var connections = [];
-var messageHistory = []; 
+var colors = {};
+var users = [], connections = [], messageHistory = [];
+var user, nickVal, colorVal, payload, usercolor;
 
 io.on('connection', function(socket){
   console.log('A socket connected');
   connections.push(socket); // add socket to array of connections
   console.log('Connected: %s sockets connected', connections.length);
 
-  // Generate a random username 
+  // Generate a random username on-click from client
   socket.on('setUsername', function(userid){
     userid = randUsername();
     if (users.indexOf(userid) > -1){
@@ -40,47 +39,49 @@ io.on('connection', function(socket){
     }
   });
 
-  // Broadcast the users array 
+  // Broadcast changes in users array
   function updateUsernames(){
     io.sockets.emit('getUsers', users);
   };
 
   // Disconnect user & socket
   socket.on('disconnect', function(data, userid){
-    disconnectUser(userid);
+    removeUser(userid);
     console.log('User %s has disconnected', socket.userid);
     io.sockets.emit('getUsers', users);
     console.log('Connected users: ', users);
     connections.splice(connections.indexOf(socket), 1); // remove socket from connections
-    console.log('Disconnection: %s sockets connected', connections.length);
+    console.log('Disconnection: %s socket(s) connected', connections.length);
   });
 
   // Sending messages to other clients
   socket.on('msg', function(msg, userid){
-    console.log('Message: "' + msg + '" from user: ' + socket.userid);
-    if (msg.substring(0,5) === "/nick"){
-      var nickVal = msg.substring(6);
+    user = socket.userid;
+    console.log('Message: "' + msg + '" from user: ' + user);
+    if (msg.substring(0,10) === "/nickcolor"){
+      colorVal = msg.substring(11);
+      setColor(user, colorVal);
+      messageHistory.push(payload);
+    }
+
+    else if (msg.substring(0,5) === "/nick"){
+      nickVal = msg.substring(6);
       if (users.indexOf(nickVal) > -1){
         socket.emit('nickExists', nickVal);
       }
       else{
-        var payload = {timestamp: getUTC(), userid: '', color: 'black', message: "User " + socket.userid + " changed their nickname to: " + nickVal}; // color function
+        usercolor = getColor(user);
+        payload = {timestamp: getUTC(), userid: '', color: usercolor, message: "User " + user + " changed their nickname to: " + nickVal}; // color function
         messageHistory.push(payload);
         io.sockets.emit('msg', payload);
-        disconnectUser(userid);
-        setNick(nickVal);
+        removeUser(userid);
+        setNick(nickVal, usercolor);
       }
     } 
 
-    else if (msg.substring(0,10) === "/nickcolor"){
-      var colorVal = msg.substring(12);
-      var payload = {timestamp: getUTC(), userid: socket.userid, color: colorVal, message: msg}; // color function
-      io.sockets.emit('msg', payload);
-      messageHistory.push(payload);
-    }
-
     else{
-      var payload = {timestamp: getUTC(), userid: socket.userid, color: 'black', message: msg}; // color function
+      usercolor = getColor(user);
+      payload = {timestamp: getUTC(), userid: user, color: usercolor, message: msg}; // color function
       io.sockets.emit('msg', payload); // emit to other users
       messageHistory.push(payload); // log msg into chat history 
     }
@@ -93,17 +94,32 @@ io.on('connection', function(socket){
     }
   }
 
-  function setNick(userid){ 
-    console.log('Nickname %s set by user %s', userid, socket.userid);
-    socket.userid = userid;
+  // Change the user nickname
+  function setNick(nickVal, usercolor){ 
+    console.log('Nickname %s set by user %s', nickVal, socket.userid);
+    socket.userid = nickVal;
+    setColor(socket.userid, usercolor);
     users.push(socket.userid);
     updateUsernames();
-    socket.emit('newUser', {username: userid});
+    socket.emit('newUser', {username: nickVal});
     console.log('Connected users: ', users);
   }
 
-  // Remove userid from users array 
-  function disconnectUser(userid){
+  // Set the RRGGBB for a user 
+  function setColor(userid, color){
+    var colorsKey = userid;
+    colors[colorsKey] = color;
+  }
+
+  // Get the user-specific color 
+  function getColor(userid){
+    var colorsKey = userid;
+    var colorsValue = colors[colorsKey];
+    return colorsValue;
+  }
+
+  // Remove/disconnect userid from users array 
+  function removeUser(userid){
     var dUser = users.splice(users.indexOf(socket.userid), 1);
     return dUser;
   }

@@ -9,7 +9,7 @@
   <body>
     <div class="wrapper">
       <div id="error-container"></div>
-      <button id="username-button" onclick="setUsername()">[random username]</button>
+      <button id="username-button" onclick="setUsername()">[click for random username]</button>
       <div class="messages-wrap" id="messages-wrap">
         <ul id="messages"></ul>
         <form id="messages-field" action="">
@@ -24,7 +24,6 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
-      var user;
       var data;
 
       var $users= $("#users");
@@ -74,11 +73,10 @@
       });
 
       socket.on('msg', function(data){
-        // append each message sent to the chat window 
-
-        $msgList.append($('<li>' + '<span class=timestamp>[' + data.timestamp + '] </span>' +
-          '<span class=userid style="color:' + data.color + '">' + 
-          data.userid + ': </span>' +
+        // append the message to the chat window 
+        $msgList.append($('<li>' + '<span class=timestamp>(' + data.timestamp + ') </span>' +
+          '<span class=userid style="color:#' + data.color + '">' + 
+          data.userid + '</span>: ' +
           '<span class=message>' + data.message + '</li>'));
 
         $msgWrap.scrollTop(function () { return this.scrollHeight;}); // http://stackoverflow.com/questions/270612/scroll-to-bottom-of-div#comment34402222_2664878
