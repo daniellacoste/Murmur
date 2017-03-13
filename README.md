@@ -2,7 +2,7 @@
 ## a simple socket.io chat application
 
 ### Requires:
-  • NodeJS
+  • [NodeJS](https://nodejs.org/en/)
 
 ### To run the server:
 ```
