@@ -35,8 +35,14 @@
       var $msgField = $("#messages-field");
       var $msgForm = $("#messages-form");
 
+
+      // Attempt to set a random username
       function setUsername(){
-        socket.emit('setUsername', data);
+        var cookie = getCookie("username")
+        if (cookie != ""){
+          socket.emit('setUsername', {username: cookie});
+        }
+        else{ socket.emit('setUsername', data); }
       };
 
       // Display an alert if the random userid already exists 
@@ -51,12 +57,26 @@
 
       // When a new user is successfully generated, show CSS
       socket.on('newUser', function(data){
-        userid = data.username;
+        if (data != null){
+          userid = data.username;
+          var cookie = getCookie("username");
+
+          if (cookie == "") {
+            createCookie(userid);
+          }
+          else { 
+            alert("Error requesting username: " + cookie);
+          }
+        }
+        else {
+          userid = getCookie("username");
+        }
+        $msgForm.attr("placeholder", "type away user " + userid + "...");
         $usernameButton.hide();
         $msgForm.focus();
         $usersWrap.show();
       });
-   
+
       // Print the users to the user area
       socket.on('getUsers', function(data){
         var html = '';
@@ -81,6 +101,53 @@
 
         $msgWrap.scrollTop(function () { return this.scrollHeight;}); // http://stackoverflow.com/questions/270612/scroll-to-bottom-of-div#comment34402222_2664878
       });
+
+      socket.on('msgHistory', function(data){
+        var msgListGet = $msgList.get(0);
+        // clear the 'peeked' messages before displaying history
+        while (msgListGet.hasChildNodes()) {
+          msgListGet.removeChild(msgListGet.firstChild);
+        }
+        for (var i = 0; i < data.length; i++){
+          $msgList.append($('<li>' + '<span class=timestamp>(' + data[i].timestamp + ') </span>' +
+            '<span class=userid style="color:#' + data[i].color + '">' + 
+            data[i].userid + '</span>: ' +
+            '<span class=message>' + data[i].message + '</li>'));
+        }   
+      });
+
+      function createCookie(userid){
+        document.cookie = "username=" + userid + "; path=/";
+        console.log(document.cookie); 
+        console.log("Creating cookie! List: " + listCookies());
+      }
+
+      // http://stackoverflow.com/questions/14573223/set-cookie-and-get-cookie-with-javascript
+      function listCookies(){
+        var theCookies= document.cookie.split(';');
+        var aString = '';
+        for (var i = 1; i <= theCookies.length; i++){
+            aString += i + ' ' + theCookies[i-1] + "\n";
+        }
+        return aString;
+      }
+
+      // https://www.w3schools.com/js/js_cookies.asp
+      function getCookie(cname) {
+          var name = cname + "=";
+          var decodedCookie = decodeURIComponent(document.cookie);
+          var ca = decodedCookie.split(';');
+          for(var i = 0; i <ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0) == ' ') {
+                  c = c.substring(1);
+              }
+              if (c.indexOf(name) == 0) {
+                  return c.substring(name.length, c.length);
+              }
+          }
+          return "";
+      }
     </script>
   </body>
 </html>

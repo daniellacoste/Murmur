@@ -23,20 +23,26 @@ io.on('connection', function(socket){
   console.log('Connected: %s sockets connected', connections.length);
 
   // Generate a random username on-click from client
-  socket.on('setUsername', function(userid){
-    userid = randUsername();
-    if (users.indexOf(userid) > -1){
-      socket.emit('userExists', userid);
+  socket.on('setUsername', function(data){
+    if (data == null){
+      userid = randUsername();
+      if (users.indexOf(userid) > -1){
+        socket.emit('userExists', userid);
+      }
+      else{
+        socket.userid = userid;
+        socket.emit('newUser', {username: userid});
+        console.log('Randomly generated user: %s', socket.userid);
+      }
     }
     else{
-      socket.userid = userid;
-      users.push(socket.userid);
-      updateUsernames();
-      chatHistory(socket);
-      socket.emit('newUser', {username: userid});
-      console.log('Randomly generated user: %s', socket.userid);
-      console.log('Connected users: ', users);
+      socket.userid = data.username;
+      socket.emit('newUser', null);
     }
+    users.push(socket.userid);
+    updateUsernames();
+    chatHistory(socket);
+    console.log('Connected users: ', users);
   });
 
   // Broadcast changes in users array
@@ -71,7 +77,7 @@ io.on('connection', function(socket){
       }
       else{
         usercolor = getColor(user);
-        payload = {timestamp: getUTC(), userid: '', color: usercolor, message: "User " + user + " changed their nickname to: " + nickVal}; // color function
+        payload = {timestamp: getUTC(), userid: '', color: usercolor, message: "User " + user + " changed their nickname to: " + nickVal};
         messageHistory.push(payload);
         io.sockets.emit('msg', payload);
         removeUser(userid);
@@ -81,7 +87,7 @@ io.on('connection', function(socket){
 
     else{
       usercolor = getColor(user);
-      payload = {timestamp: getUTC(), userid: user, color: usercolor, message: msg}; // color function
+      payload = {timestamp: getUTC(), userid: user, color: usercolor, message: msg};
       io.sockets.emit('msg', payload); // emit to other users
       messageHistory.push(payload); // log msg into chat history 
     }
@@ -89,9 +95,7 @@ io.on('connection', function(socket){
 
   // Print the chat history to new users 
   function chatHistory(socket){
-    for (var i = 0; i < messageHistory.length; i++){
-      socket.emit('msg', messageHistory[i]); 
-    }
+    socket.emit('msgHistory', messageHistory); 
   }
 
   // Change the user nickname
