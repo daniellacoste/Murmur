@@ -141,8 +141,8 @@ function getUTC(){
   return dateStr;
 };
 
-// Generate a random userid b/w 1-10
+// Generate a random userid b/w 1-10000
 function randUsername(){
-  var data = Math.floor((Math.random() * 10)+1);
+  var data = Math.floor((Math.random() * 10000)+1);
   return data;
 };
