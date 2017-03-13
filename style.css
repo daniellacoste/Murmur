@@ -55,9 +55,6 @@ form button {
   z-index: 1;
 }
 
-#username-button:active {
-}
-
 .messages-wrap {
   position: absolute;
   bottom: 70px;
@@ -80,10 +77,6 @@ form button {
   margin: 5px;
   border-radius: 15px;
   background: #E6F2FD;
-}
-
-#messages li:nth-child(odd) { 
-/*  background: #E3F2FD;*/
 }
 
 .users-wrap{
@@ -126,4 +119,3 @@ form button {
   font-weight: 900;
   font-size: 25px;
 }
-
