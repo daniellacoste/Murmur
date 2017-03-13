@@ -26,19 +26,19 @@
       var socket = io();
       var data;
 
-      var $users= $("#users");
-      var $usersWrap= $(".users-wrap");
+      var $users = $("#users");
+      var $usersWrap = $(".users-wrap");
       var $usernameButton = $("#username-button");
 
       var $msgList = $("#messages");
-      var $msgWrap= $("#messages-wrap");
+      var $msgWrap = $("#messages-wrap");
       var $msgField = $("#messages-field");
       var $msgForm = $("#messages-form");
-
 
       // Attempt to set a random username
       function setUsername(){
         var cookie = getCookie("username")
+        // check if a cookie exists
         if (cookie != ""){
           socket.emit('setUsername', {username: cookie});
         }
@@ -64,13 +64,11 @@
           if (cookie == "") {
             createCookie(userid);
           }
-          else { 
-            alert("Error requesting username: " + cookie);
-          }
+          else { alert("Error requesting username: " + cookie); }
         }
-        else {
-          userid = getCookie("username");
-        }
+        else { userid = getCookie("username"); }
+
+        // adjust CSS accordingly:
         $msgForm.attr("placeholder", "type away user " + userid + "...");
         $usernameButton.hide();
         $msgForm.focus();
@@ -86,9 +84,10 @@
         $users.html(html);
       });
 
+      // Emit a message with what has been typed into the form and clear the form
       $msgField.submit(function(){
         socket.emit('msg', $msgForm.val());
-        $msgForm.val(''); // clear message field 
+        $msgForm.val('');
         return false;
       });
 
@@ -116,6 +115,7 @@
         }   
       });
 
+      // Create a cookie for new user
       function createCookie(userid){
         document.cookie = "username=" + userid + "; path=/";
         console.log(document.cookie); 

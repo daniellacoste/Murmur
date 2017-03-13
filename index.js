@@ -64,12 +64,15 @@ io.on('connection', function(socket){
   socket.on('msg', function(msg, userid){
     user = socket.userid;
     console.log('Message: "' + msg + '" from user: ' + user);
+    
+    // set a nickname color with RRGGBB values
     if (msg.substring(0,10) === "/nickcolor"){
       colorVal = msg.substring(11);
       setColor(user, colorVal);
       messageHistory.push(payload);
     }
 
+    // set a new nickname
     else if (msg.substring(0,5) === "/nick"){
       nickVal = msg.substring(6);
       if (users.indexOf(nickVal) > -1){
