@@ -22,6 +22,14 @@ Click the **[click for random username]** button to begin chatting!
 /nickcolor RRGGBB
 ```
 
+### Murmur Chat Window:
+
+![Murmur Chat Window](/../screenshots/murmur-window.png?raw=true "Murmur Chat Window")
+
+### Future Features:
+
+Check out the [Issues](https://github.com/daniellacoste/chat-app/issues) tab!
+
 Powered by [socket.io](https://socket.io/)
 
 _Originally developed for W2017 SENG513._
