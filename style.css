@@ -30,13 +30,14 @@ form input {
 }
 
 form button { 
-  font-size: 25px;
-  color: #fff;
-  text-shadow: 1px 1px black;
-  vertical-align: middle;
-  width: 10%;
   background: #EF5350;
   border: 0;
+  color: #fff;
+  float: right;
+  font-size: 20px;
+  margin-top: 15px;
+  text-shadow: 1px 1px black;
+  width: 9%;
 }
 
 #username-button {
@@ -73,10 +74,10 @@ form button {
 }
 
 #messages li {
-  padding: 5px 5px;
-  margin: 5px;
   border-radius: 15px;
   background: #E6F2FD;
+  margin: 5px;
+  padding: 1%;
 }
 
 .users-wrap{
@@ -117,5 +118,5 @@ form button {
 
 .message {
   font-weight: 900;
-  font-size: 25px;
+  font-size: 20px;
 }

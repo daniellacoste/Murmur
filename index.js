@@ -140,7 +140,11 @@ io.on('connection', function(socket){
 // Calculate the current time
 function getUTC(){
   var d = new Date();
-  var dateStr = d.toUTCString();
+  var hr = d.getHours();
+  var min = d.getMinutes();
+  var sec = d.getSeconds();
+  var dateStr = hr + ':' + min + ':' + sec;
+  dateStr = dateStr.toString();
   return dateStr;
 };
 
